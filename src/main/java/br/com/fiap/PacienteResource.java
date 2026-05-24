@@ -2,6 +2,7 @@ package br.com.fiap;
 
 import br.com.fiap.entities.Paciente;
 import br.com.fiap.bo.PacienteBO;
+import br.com.fiap.exceptions.CpfInvalidoException;
 import br.com.fiap.exceptions.EnderecoNaoEncontradoException;
 import jakarta.ws.rs.*;
 import jakarta.ws.rs.core.*;
@@ -16,40 +17,35 @@ public class PacienteResource {
 
     private PacienteBO pacienteBO = new PacienteBO();
 
-    // Selecionar
     @GET
     @Produces(MediaType.APPLICATION_JSON)
-    public ArrayList<Paciente> selecionarRs() throws ClassNotFoundException, SQLException, SQLException {
-        return  (ArrayList<Paciente>)  pacienteBO.selecionarBo();
+    public ArrayList<Paciente> selecionarRs() throws ClassNotFoundException, SQLException {
+        return (ArrayList<Paciente>) pacienteBO.selecionarBo();
     }
 
-    // Buscar por RM
     @GET
     @Path("/{id}")
     @Produces(MediaType.APPLICATION_JSON)
-    public Paciente buscarPorID(@PathParam("id") int id) throws ClassNotFoundException, SQLException, SQLException {
-        return  (Paciente)  PacienteBO.buscarPorID(id);
+    public Paciente buscarPorID(@PathParam("id") int id) throws ClassNotFoundException, SQLException {
+        return PacienteBO.buscarPorID(id);
     }
 
-    // Inserir
     @POST
     @Consumes(MediaType.APPLICATION_JSON)
-    public Response inserirRs(Paciente paciente, @Context UriInfo uriInfo ) throws ClassNotFoundException, SQLException, EnderecoNaoEncontradoException {
+    public Response inserirRs(Paciente paciente, @Context UriInfo uriInfo) throws ClassNotFoundException, SQLException, EnderecoNaoEncontradoException, CpfInvalidoException {
         PacienteBO.inserirBo(paciente);
         UriBuilder builder = uriInfo.getAbsolutePathBuilder();
         builder.path(Integer.toString(paciente.getId()));
         return Response.created(builder.build()).build();
     }
 
-    // Atualizar
     @PUT
     @Consumes(MediaType.APPLICATION_JSON)
-    public Response atualizarRs(Paciente paciente, @PathParam("id") int id) throws ClassNotFoundException, SQLException {
+    public Response atualizarRs(Paciente paciente) throws ClassNotFoundException, SQLException {
         pacienteBO.atualizarBo(paciente);
         return Response.ok().build();
     }
 
-    // Deletar
     @DELETE
     @Path("/{id}")
     @Consumes(MediaType.APPLICATION_JSON)
